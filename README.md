@@ -1,6 +1,6 @@
 # Fortuna
 
-Проект собран с помощью менеджера пакетов `poentry`
+Проект собран с помощью менеджера пакетов `poetry`
 
 > Установить его мужно [тут](https://python-poetry.org/docs/#installation)
 

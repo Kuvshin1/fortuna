@@ -1,0 +1,43 @@
+<div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 shadow-sm">
+    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+        <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+            {% for href, caption, icon, submenu, allow_roles in [('/', 'Главная', 'search', [], ['USER', 'MODERATOR', 'ADMIN']),
+                                                    ('/objects/list?status=waiting', 'Подтверждение объектов', 'check-square', [], ['MODERATOR', 'ADMIN']),
+                                                    ('/objects/', 'Добавление объектов', 'database-add', [], ['USER', 'MODERATOR', 'ADMIN']),
+                                                    ('/auth_logs/', 'Логи', 'exclamation-octagon', [], ['ADMIN']),
+                                                    ('/user_guide/', 'Руководство пользователя', 'question-diamond', [], ['USER', 'MODERATOR', 'ADMIN']),
+                                                    ('', 'Настройки', 'gear', [
+                                                            ('/settings/properties/','Пользовательские типы', 'file-earmark-minus'),
+                                                            ('/settings/models/', 'Модели', 'file-earmark-medical'),
+                                                            ('/settings/users/', 'Пользователи', 'people')
+                                                        ], ['ADMIN']),
+                                                ] %}
+                <li class="nav-item">
+                    {% if request.user.role.value in allow_roles %}
+                        {% if submenu|length > 0 %}
+                            <a href="#submenu{{ loop.index }}" data-bs-toggle="collapse" class="nav-link px-0 align-middle d-flex">
+                                <i class="fs-5 bi-{{ icon }} d-inline-block my-auto "></i> 
+                                <span class=" d-inline-block my-auto ms-2 ">{{ caption }}</span>
+                                <i class="bi bi-chevron-down d-inline-block my-auto ms-2 "></i>
+                            </a>
+                        {% else %}
+                            <a href="{{ href }}" class="nav-link align-middle px-0 d-flex ">
+                                <i class="fs-5 bi-{{ icon }} d-inline-block my-auto "></i> 
+                                <span class="ms-2 d-inline-block my-auto ">{{ caption }}</span>
+                            </a>
+                        {% endif %}
+                        {% if submenu|length > 0 %}
+                            <ul class="collapse show nav flex-column ms-3" id="submenu{{ loop.index }}" data-bs-parent="#menu">
+                            {% for hrefSub, captionSub, iconSub in submenu %}
+                                <li class="w-100">
+                                    <a href="{{ hrefSub }}" class="nav-link px-0"> <span class="d-inline-block my-auto "> <i class="fs-5 bi-{{ iconSub }}"></i> {{ captionSub }}</span></a>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

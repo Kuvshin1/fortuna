@@ -1,0 +1,132 @@
+<div class="row col-10">
+    <div class="p-3 col-5 border rounded overflow-hidden shadow-sm">
+        <h5>Основная Информация</h5>
+        <hr/>
+        <div>
+            <div class="mb-1"><span class="fw-light">Логин: </span><b>{{ user.login }}</b></div>
+            <div class="mb-1"><span class="fw-light">Роль: </span>
+                <span
+                        class="badge bg-{{ user_role_map[user.role.value] }} rounded-pill">{{ user.role.value }}
+        </span>
+            </div>
+            <div class="mb-1">
+                <span class="fw-light">Дата создания: </span><b>{{ user.created_at.strftime('%d/%m/%Y, %H:%M:%S') }}</b>
+            </div>
+            <div class="mb-1">
+                <span class="fw-light">Последнее посещение: </span>
+                {% if last_auth_log %}
+                    <b>{{ last_auth_log.created_at.strftime('%d/%m/%Y, %H:%M:%S') }}</b>
+                    <a href="{{ URL(url_for('auth_logs_page')).include_query_params(user=user.login) }}" role="button" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-file-earmark-plus"></i>
+                    </a>
+                {% else %}
+                    <b>Отсутствует</b>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="p-3 col-6 offset-md-1 border rounded overflow-hidden shadow-sm opacity-50">
+        <h5>Активность</h5>
+        <hr/>
+        <small class="text-muted">Кликните на число для подробной информации</small>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Тип</th>
+                <th scope="col">Просмотрено</th>
+                <th scope="col">Создано</th>
+                <th scope="col">Проверено</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th scope="row">Автомобили</th>
+                <td><span class="badge bg-primary">24</span></td>
+                <td>
+                    <span class="badge bg-primary">1</span>
+                </td>
+                <td>
+                    <span class="badge bg-primary">5</span>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">Люди</th>
+                <td><span class="badge bg-secondary">0</span></td>
+                <td>
+                    <span class="badge bg-primary">1</span>
+                </td>
+                <td>
+                    <span class="badge bg-primary">5</span>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">Телефоны</th>
+                <td><span class="badge bg-secondary">0</span></td>
+                <td>
+                    <span class="badge bg-success">100</span>
+                </td>
+                <td>
+                    <span class="badge bg-primary">5</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row col-10 mt-5 p-3 border rounded overflow-hidden shadow-sm">
+    <div class="d-flex justify-content-between align-items-center pb-1">
+        <div class="mr-auto">
+            <b>Токены</b>
+        </div>
+        <div>
+            <a href="{{ url_for('update_user_token_page', user_id=user.id) }}" role="button" class="btn btn-outline-warning btn-sm">
+                Перевыпустить
+            </a>
+        </div>
+    </div>
+    <hr/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">ID токена</th>
+            <th scope="col">Модели</th>
+            <th scope="col">Статус</th>
+            <th scope="col">Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for token in tokens %}
+        <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ token.id }}</td>
+            <td>
+                {% for access_model_kind in token.access_model_kind_names %}
+                <span class="badge bg-primary">{{ access_model_kind }}</span>
+                {% endfor %}
+            </td>
+            <td>
+                {% if token.deprecated %}
+                <span class="badge bg-secondary rounded-pill">отозван</span>
+                {% else %}
+                <span class="badge bg-success rounded-pill">активен</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if not token.deprecated %}
+                <form method="post" action="{{ url_for('deprecate_user_token', id=user.id) }}">
+                    <input type="hidden" name="deprecated" value="true" />
+                    <button
+                            type="submit"
+                            class="btn btn-outline-danger btn-sm"
+                    >
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

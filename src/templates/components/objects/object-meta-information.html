@@ -1,0 +1,35 @@
+<div class="pb-5">
+    <p class="fs-5 bold"><b>О объекте</b></p>
+    <div class="mb-1">
+        <p class="mb-0"><b>Статус: </b>
+            {% if object.status.approve_at != None %}
+            <span class="badge text-bg-success">Принята</span>
+            {% elif object.status.decline_at != None %}
+            <span class="badge text-bg-danger">Отклонена</span>
+            {% elif object.status.decline_at == None and object.status.approve_at == None %}
+            <span class="badge text-bg-warning">Ожидает подтверждения </span>
+            {% endif %}
+        </p>
+    </div>
+    <div class="mb-1">
+        <p class="mb-0"><b>Владелец: </b> {{owner}}</p>
+    </div>
+    <div class="mb-1">
+        <p class="mb-0"><b>Дата создания: </b> {{object.created_at}}</p>
+    </div>
+    {% if object.status.approve_at != None %}
+    <div class="mb-1">
+        <p class="mb-0"><b>Принята в: </b> {{object.status.approve_at}}</p>
+    </div>
+    <div class="mb-1">
+        <p class="mb-0"><b>Принята модератором: </b> {{moderator_login}}</p>
+    </div>
+    {% elif object.status.decline_at != None %}
+    <div class="mb-1">
+        <p class="mb-0"><b>Отклонена в: </b> {{object.status.decline_at}}</p>
+    </div>
+    <div class="mb-1">
+        <p class="mb-0"><b>Принята модератором: </b> {{moderator_login}}</p>
+    </div>
+    {% endif %}
+</div>

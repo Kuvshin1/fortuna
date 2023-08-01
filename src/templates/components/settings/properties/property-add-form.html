@@ -1,0 +1,118 @@
+<form method="post" id="propertyForm">
+    <div class="mb-3">
+        <label for="inputLogin" class="form-label">Название</label>
+        <input name="name" class="form-control" id="inputLogin" aria-describedby="emailHelp" required>
+    </div>
+    <div class="mb-3 row mt-4" id="field1">
+        <div class="col-5">
+            <select class="form-select" name="dType" id="dataTypeSelector" required>
+              <option selected disabled value="">Выберите тип данных</option>
+              <option value="STR">Строковый</option>
+              <option value="NUMBER">Числовой</option>
+              <option value="DATE">Дата</option>
+              <option value="BOOL">Логический</option>
+            </select>
+        </div>
+        <div class="col-6">
+            <input name="fieldName" class="form-control" id="inputModelName" aria-describedby="emailHelp" required placeholder="Введите название поля">
+        </div>
+        <div class="col-1">
+            <button class="btn btn-danger float-end disabled" type="button" id="deleteField1" onclick="deleteField(this.id)" ><i class="bi bi-trash"></i></button>
+        </div>
+    </div>
+    <button class="btn btn-primary mt-3" type="button" id="addField">Добавить поле</button>
+    <button class="btn btn-success mt-3 float-end" id="sendData" type="submit">Создать</button>
+</form>
+<!-- template to new field -->
+<div class="mb-3 row d-none" id="appendField" >
+    <div class="col-5">
+        <select class="form-select" name="dType" id="dataTypeSelector" required>
+            <option selected disabled value="">Выберите тип данных</option>
+            <option value="STR">Строковый</option>
+            <option value="NUMBER">Числовой</option>
+            <option value="DATE">Дата</option>
+            <option value="BOOL">Логический</option>
+            </select>
+    </div>
+    <div class="col-6">
+        <input name="fieldName" class="form-control" id="inputModelName" aria-describedby="emailHelp" required placeholder="Введите название поля">
+    </div>
+    <div class="col-1">
+        <button class="btn btn-danger float-end" type="button" id="deleteAppendedField" onclick="deleteField(this.id)"><i class="bi bi-trash"></i></button>
+    </div>
+</div>
+<!-- end template to new field -->
+  <script>
+    const buttonAddField = document.querySelector('#addField');
+    buttonAddField.addEventListener('click', function() {
+        const countFields = document.querySelectorAll('div.row.mb-3').length-1;
+        let fieldId
+        if (countFields == 1) {
+            document.querySelector('div.row.mb-3 button.btn-danger').classList.remove('disabled');
+            fieldId = 2
+        }
+        else{
+            fieldId = String(Number(document.querySelectorAll('div.row.mb-3')[countFields-1].id.slice(-1))+1)
+        }
+        
+        templateFieldToAppend = document.querySelector('#appendField')
+        fieldToAppend = templateFieldToAppend.cloneNode(true)
+        
+        fieldToAppend.id = 'field'+fieldId
+        fieldToAppend.lastElementChild.lastElementChild.id='deleteField'+fieldId
+        fieldToAppend.classList.remove('d-none')
+
+        buttonAddField.parentElement.insertBefore(fieldToAppend, buttonAddField);
+    });
+
+    function deleteField(buttonId) {
+        document.getElementById('field'+buttonId.slice(-1)).remove();
+        if (document.querySelectorAll('div.row.mb-3').length == 2) {
+            document.querySelector('div.row.mb-3 button.btn-danger').classList.add('disabled')
+        }
+    }
+
+    function serializeForm(formNode) {
+        const { elements } = formNode
+        const data = {}
+        data['properties'] = []
+        Array.from(elements).filter((item) => !!item.name).forEach((element) => {
+            const { name, value } = element
+            if (name == 'name') {
+                data['name'] = value
+            }
+            else if (name == 'dType') {
+                data['properties'].push({'primitive_type':value})
+            }
+            else if (name == 'fieldName') {
+                data['properties'][data['properties'].length-1]['name'] = value
+            }
+            })
+        return data
+    }
+
+    async function sendData(data, event) {
+        $.ajax({
+            url:"{{ add_property_endpoint }}",
+            method: 'POST',
+            contentType:'application/json',
+            data: JSON.stringify(data),
+            success: function(response){
+                $('#propertyForm')[0].reset()
+                $.notify(`Пользовательский тип "${response}" успешно создан`,"success")
+                $('button').prop("disabled",false)
+            }
+        })
+    }
+    
+    async function handleFormSubmit(event) {
+        event.preventDefault()
+        $('button').prop("disabled",false)
+
+        const data = serializeForm(event.target)
+        const response = await sendData(data, event)
+    }
+
+    const applicantForm = document.getElementById('propertyForm')
+    applicantForm.addEventListener('submit', handleFormSubmit)
+  </script>

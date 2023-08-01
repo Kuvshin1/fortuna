@@ -1,0 +1,21 @@
+{% extends "/shared/layout.html" %}
+{% block header %}
+    {% include "/components/global/header.html" %}
+{% endblock %}
+{% block sidebar %}
+    {% include "/components/global/sidebar.html" %}
+{% endblock %}
+{% block content %}
+<div class="py-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ url_for('models_list_page') }}">Модели</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Создание схемы модели</li>
+        </ol>
+    </nav>
+    <h4 class="ms-2">Создание модели</h4>
+    <div class="m-2 p-3 mt-3 shadow col-8">
+        {% include "/components/settings/models/model-add-form.html" %}
+    </div>
+</div>
+{% endblock %}

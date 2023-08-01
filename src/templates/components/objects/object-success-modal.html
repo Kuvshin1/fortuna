@@ -1,0 +1,22 @@
+<div class="modal fade" id="modal-success-show" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="1" aria-labelledby="ModalToggleLabel">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body text-break input-group">
+            <p>Объект успешно <b id="action"> </b></p>
+        </div>
+        <div class="modal-footer">
+            <a class="btn btn-primary" href="{{ url_for('objects_page') }}" role="button">Назад</a>
+            <a class="btn btn-success" href="{{ url_for('object_page', id=object.id) }}" role="button">Ок</a>
+        </div>
+      </div>
+    </div>
+</div>
+<script>
+    function showModal(action) {
+        const modalTokenShow = new bootstrap.Modal(document.getElementById('modal-success-show'), {
+            keyboard: false
+        })
+        $("#action").text(action)
+        modalTokenShow.show()
+    }
+</script>

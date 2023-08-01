@@ -1,0 +1,28 @@
+{% extends "/shared/layout.html" %}
+{% block header %}
+    {% include "/components/global/header.html" %}
+{% endblock %}
+{% block sidebar %}
+    {% include "/components/global/sidebar.html" %}
+{% endblock %}
+{% block content %}
+<div class="py-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ URL(url_for('objects_page')).include_query_params(status='waiting') }}">Все объекты</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Просмотр объекта модели {{ model_name }}</li>
+        </ol>
+    </nav>
+    <h4 class="ms-2"> Объект модели {{ model_name }}</h4>
+    <div class="d-flex">
+        <div class="m-2 p-3 mt-3 shadow col-6">
+            {% include "/components/objects/object-content.html" %}
+        </div>
+        <div class="m-2 p-3 mt-3 shadow col-4">
+            {% include "/components/objects/object-meta-information.html" %}
+        </div>
+    </div>
+    {% include "/components/objects/object-success-modal.html" %}
+    {% include "/components/objects/object-decline-modal.html" %}
+</div>
+{% endblock %}

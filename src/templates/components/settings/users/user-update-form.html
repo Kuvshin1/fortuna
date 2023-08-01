@@ -1,0 +1,16 @@
+<form method="post" action="{{ url_for('update_user_token', user_id=user.id) }}">
+    <div class="mb-3">
+      <label for="inputLogin" class="form-label">Логин</label>
+      <input name="login" class="form-control" id="inputLogin" aria-describedby="emailHelp" disabled value="{{ user.login }}">
+    </div>
+    <h5>Настройте список доступа</h5>
+    {% for schema in models_list %}
+        <div class="form-check mb-2">
+            <input class="form-check-input" name="access_model_kinds" type="checkbox" value="{{ schema.name }}" id="{{ loop.index }}">
+            <label class="form-check-label" for="{{ loop.index }}">
+                {{ schema.name }}
+            </label>
+        </div>
+    {% endfor %}
+    <button class="btn btn-primary mt-3" type="submit">Обновить</button>
+  </form>

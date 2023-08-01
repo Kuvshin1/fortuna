@@ -1,0 +1,8 @@
+POST http://127.0.0.1:8000/api/v1/auth_logs/list
+content-type: application/json
+
+{
+    "start": 0,
+    "length": 20,
+    "filters": {}
+}

@@ -1,0 +1,50 @@
+<div class="row col-10">
+    {% for iteration in history %}
+    <div class="row col-10 p-3 border rounded overflow-hidden shadow-sm ms-2 mb-4">
+        <div class="d-flex justify-content-between align-items-center pb-1">
+            <div class="mr-auto">
+                <b>
+                    {% if loop.first %}
+                        Актуальная версия
+                    {% else %} 
+                        Версия №{{ loop.revindex }}
+                    {% endif %}
+                </b>
+            </div>
+        </div>
+        <hr/>
+        <div class="accordion" id="accordionPanelsStayOpenExample{{ loop.index }}">
+            {% for type in iteration.types_id %}
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="open-{{ type.name }}{{ iteration.id }}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ type.name }}{{ iteration.id }}" aria-expanded="false" aria-controls="collapse-{{ type.name }}{{ iteration.id }}">
+                    {{ type.name }}
+                </button>
+              </h2>
+              <div id="collapse-{{ type.name }}{{ iteration.id }}" class="accordion-collapse collapse" aria-labelledby="open">
+                <div class="accordion-body">
+                    <ul class="list-group list-group-flush">
+                    {% for property in type.properties %}
+                    <li class="list-group-item list-group-item d-flex">
+                        {% if property.primitive_type.value == "STR" %}  
+                            <i class="fs-5 bi-card-text d-inline-block my-auto me-2"></i> 
+                        {% elif property.primitive_type.value == "NUMBER" %}
+                            <i class="fs-5 bi-123 d-inline-block my-auto me-2"></i> 
+                        {% elif property.primitive_type.value == "DATE" %}
+                            <i class="fs-5 bi-calendar3 d-inline-block my-auto me-2"></i>
+                        {% elif property.primitive_type.value == "BOOL" %}
+                            <i class="fs-5 bi-check-square d-inline-block my-auto me-2"></i>
+                        {% endif %}
+                            <p class="my-auto">{{ property.name }}</p>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+    
+</div>

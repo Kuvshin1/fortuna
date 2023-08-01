@@ -1,0 +1,15 @@
+{% extends "/shared/layout.html" %}
+{% block header %}
+    {% include "/components/global/header.html" %}
+{% endblock %}
+{% block sidebar %}
+    {% include "/components/global/sidebar.html" %}
+{% endblock %}
+{% block content %}
+<div class="py-3">
+    <h4 class="ms-2">Поиск в системе</h4>
+    <div class="m-2 p-3 mt-3">
+        {% include "/components/search/search-container.html" %}
+    </div>
+</div>
+{% endblock %}

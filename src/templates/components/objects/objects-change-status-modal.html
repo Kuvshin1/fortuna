@@ -1,0 +1,23 @@
+<div class="modal fade" id="modal-change-status" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="1" aria-labelledby="ModalToggleLabel">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body text-break input-group">
+            <p>Вы действительно хотите <b id="action"> </b> выбранные объекты</p>
+        </div>
+        <div class="modal-footer">
+            <a class="btn btn-primary" href='#' onclick='location.reload(true); return false;' role="button">Нет</a>
+            <a class="btn btn-success" id='confirm' role="button">Да</a>
+        </div>
+      </div>
+    </div>
+</div>
+<script>
+    function showModal(action, onclick) {
+        const modalTokenShow = new bootstrap.Modal(document.getElementById('modal-change-status'), {
+            keyboard: false
+        })
+        $("#action").text(action)
+        $("#confirm").attr("onclick", onclick);
+        modalTokenShow.show()
+    }
+</script>

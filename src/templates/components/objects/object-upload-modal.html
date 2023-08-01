@@ -1,0 +1,47 @@
+<div class="modal fade" id="modal-upload" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="1" aria-labelledby="ModalToggleLabel">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Пакетная загрузка объектов</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        <div class="modal-body">
+            <label for="formFile" class="form-label">Выберите файл с объектами</label>
+            <input class="form-control" type="file" id="formFile" required>
+        </div>
+        <div class="modal-footer">
+            <a class="btn btn-success" onclick="sendFile()" role="button">Загрузить</a>
+        </div>
+      </div>
+    </div>
+</div>
+<script>
+    var modalUploadShow = new bootstrap.Modal(document.getElementById('modal-upload'), {
+        keyboard: false
+    })
+    function showUploadModal() {
+        modalUploadShow.show()
+    }
+    function sendFile() {
+
+        let formData = new FormData()
+		formData.append('file', $("#formFile")[0].files[0]);
+ 
+		$.ajax({
+			type: "POST",
+			url: '/api/v1/objects/file/upload',
+			cache: false,
+			contentType: false,
+			processData: false,
+			data: formData,
+			success: function(response){
+                modalUploadShow.hide()
+                console.log(response)
+                if(response != false)
+                    $.notify(`Успешно загружено "${response}" объектов`,"success")
+                else
+                    $.notify(`Что-то пошло не так, убедитесь в корректности загружаемых данных`,"error")
+			}
+		});
+    }
+</script>

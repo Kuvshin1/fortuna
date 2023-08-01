@@ -1,0 +1,21 @@
+{% extends "/shared/layout.html" %}
+{% block header %}
+    {% include "/components/global/header.html" %}
+{% endblock %}
+{% block sidebar %}
+    {% include "/components/global/sidebar.html" %}
+{% endblock %}
+{% block content %}
+<div class="py-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ url_for('available_models_page') }}">Доступные модели</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Добавление объекта</li>
+        </ol>
+    </nav>
+    <h4 class="ms-2">Добавление нового объекта модели {{ models_schema.name }}</h4>
+    <div class="m-2 p-3 mt-3 shadow col-8">
+        {% include "/components/objects/object-add-form.html" %}
+    </div>
+</div>
+{% endblock %}

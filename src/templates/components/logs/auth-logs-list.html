@@ -1,0 +1,131 @@
+<div class="col-12">
+    <div class="row">
+        <div class="col-2 mb-3">
+            <div>
+                <label for="selectStatus" class="col-sm-2 col-form-label">Статус:</label>
+                <select id="selectStatus" class="form-select form-select-sm">
+                    <option value="None" {% if success == 'None' %}selected{% endif %}>Все</option>
+                    <option value="true" {% if success == True %}selected{% endif %}>Успешные</option>
+                    <option value="false" {% if success == False %}selected{% endif %}>С ошибками</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-2 mb-3">
+            <div>
+                <label for="selectUser" class="col-sm-2 col-form-label">Логин:</label>
+                <select id="selectUser" class="form-select form-select-sm">
+                    <option value="None" selected>Все</option>
+                    {% for user in users %}
+                    <option value="{{ user.login }}" {% if user.login == login %}selected{% endif %}>{{ user.login }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+    <table id="datatables-auth-logs" class="table table-striped display" style="width:100%">
+        <thead>
+        <tr>
+            <th>Логин</th>
+            <th>Статус</th>
+            <th>Время</th>
+            <th>IP</th>
+            <th>Причина</th>
+            <th>Клиент</th>
+        </tr>
+        </thead>
+        <tfoot>
+        <tr>
+            <th>Логин</th>
+            <th>Статус</th>
+            <th>Время</th>
+            <th>IP</th>
+            <th>Причина</th>
+            <th>Клиент</th>
+        </tr>
+        </tfoot>
+    </table>
+</div>
+<script>
+    function render_dt() {
+        const success = $('#selectStatus').val() == 'None' ? undefined : $('#selectStatus').val()
+        const login = $('#selectUser').val() == 'None' ? undefined : $('#selectUser').val()
+        $('#datatables-auth-logs').DataTable({
+            processing: true,
+            serverSide: true,
+            ordering: false,
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.1/i18n/ru.json'
+            },
+            ajax: {
+                url: '/api/v1/auth_logs/list/dt',
+                type: 'POST',
+                data: function (data) {
+                    return JSON.stringify({
+                        ...data,
+                        filters: {
+                            success,
+                            login
+                        }
+                    })
+                },
+                contentType: 'application/json',
+            },
+            aoColumns: [
+                { "mData": "login" },
+                { "mData": "success" },
+                { "mData": "created_at" },
+                { "mData": "ip" },
+                { "mData": "reason" },
+                { "mData": "user_agent" }
+            ],
+            columnDefs: [
+                {
+                    "target": 1,
+                    "render": function(value, type, row, meta) {
+                        const result = value ? '<span class="badge text-bg-success">Удачно</span>' : '<span class="badge text-bg-danger">Ошибка</span>'
+                        return result
+                    }
+                },
+                {
+                    "target": 2,
+                    "render": function(value, type, row, meta) {
+                        const result = new Date(value)
+                        return result.toLocaleString('ru-RU')
+                    }
+                },
+            ]
+        })
+    }
+
+    $(document).ready(function () {
+        render_dt()
+    })
+
+    function reloadPage() {
+        const success = $('#selectStatus').val() == 'None' ? undefined : $('#selectStatus').val()
+        const user = $('#selectUser').val() == 'None' ? undefined : $('#selectUser').val()
+
+        let url = window.location.href
+        if (url.indexOf('?') != -1) {
+           url = url.slice(0, url.indexOf('?'))
+        }
+
+        let params = {}
+        if (success)
+            params['success'] = success
+        if (user)
+            params['user'] = user
+
+        recursiveEncoded = $.param(params);
+        url = `${url}?${recursiveEncoded}`
+        window.location.href = url;
+    }
+    
+    $('#selectStatus').change(function(value) {
+        reloadPage()
+    })
+
+    $('#selectUser').change(function(value) {
+        reloadPage()
+    })
+</script>

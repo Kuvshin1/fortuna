@@ -1,0 +1,200 @@
+<div class="row gap-3">
+  <!-- <div class="col-sm-3">
+    <div class="shadow p-3">
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-outline-secondary">
+          <i class="bi bi-plus-lg"></i>Добавить фильтр
+        </button>
+      </div>
+    </div>
+  </div> -->
+  <div class="col-sm-8">
+    <form id="search-form">
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1"
+          ><i class="bi bi-search"></i
+        ></span>
+        <input
+          type="text"
+          id="search-input"
+          class="form-control"
+          placeholder="Начните поиск..."
+          aria-label="Username"
+          aria-describedby="basic-addon1"
+        />
+        <button type="sudmit" id="search-button" class="btn btn-outline-secondary">Найти</button>
+      </div>
+    </form>
+    <div class="alert alert-warning" id="warning-container" role="alert">
+      Введите запрос для поиска!
+    </div>
+    <div class="px-3 shadow mt-3 py-1 d-none" id="models-list-container">
+    </div>
+    <div class="d-none" id="loading-indicator">
+      <div class="text-center">
+        <div
+          class="spinner-border my-1"
+          style="width: 4rem; height: 4rem"
+          role="status"
+        >
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+    <div class="mt-2 text-center d-none" id="fecth-more-models-container">
+      <button type="button" class="btn btn-secondary" id="fecth-more-models-button">Показать еще</button>
+    </div>
+  </div>
+</div>
+
+<script>
+modelsListContainer$      = $("#models-list-container")
+loadingIndicator$         = $("#loading-indicator")
+warningAlert$             = $('#warning-container')
+searchInput$              = $('#search-input')
+searchForm$               = $('#search-form')
+fetchMoreModelsContainer$ = $('#fecth-more-models-container')
+fetchMoreModelsButton$    = $('#fecth-more-models-button')
+
+let page = 1
+
+searchForm$.submit((e) => {
+  page = 1
+  e.preventDefault()
+  const text = searchInput$.val()
+  hide(modelsListContainer$)
+  hide(fetchMoreModelsContainer$)
+  getModels(page, text)
+})
+
+fetchMoreModelsButton$.click(() => {
+  const text = searchInput$.val()
+  ++page
+  hide(fetchMoreModelsContainer$)
+  getModels(page, text)
+})
+
+
+async function getModels(page, text) {
+  hide(warningAlert$)
+  if (!text) {
+    changeInnerText(warningAlert$, 'Введите текст для запроса')
+    show(warningAlert$)
+    return
+  }
+  const response = await fetchModels(page, text)
+  const models = response.data
+  if (page == 1) {
+    modelsListContainer$.empty()
+  }
+  if (page == 1 && !models.length) {
+    changeInnerText(warningAlert$, `Ничего не найдено по запросу: <b>${text}</b>`)
+    show(warningAlert$)
+    return
+  }
+  for (model of models) {
+    modelsListContainer$.append(buildModelListItemHtml(model))
+  }
+  if (response.is_next) {
+    show(fetchMoreModelsContainer$)
+  }
+  show(modelsListContainer$)
+}
+
+function buildModelListItemHtml(model) {
+  return `<div class="models-list-item">
+    <div class="" id="model-card-container">
+        ${buildPayloadListHtml(model.payload)}
+    </div>
+    ${buildModelCardFooter(model._id)}
+  </div>`
+}
+
+function buildPayloadListHtml(payload) {
+  let html = ''
+  for (property of payload) {
+    html += `
+      <div
+        class="px-2 text-center text-secondary text-opacity-25 fs-5 fw-bolder user-select-none"
+        id="model-card-name"
+      >
+        ${property.property_name}
+      </div>
+    `
+    html += property.data.reduce((acc, cur) => 
+      acc += `
+        <div class="row" id="model-card-content-row">
+          <div
+            class="col text-end text-muted"
+            id="model-card-content-row-name"
+          >
+            ${cur.name}
+          </div>
+          <div class="col" id="model-card-content-row-value">${cur.value}</div>
+        </div>
+      `
+    , '')
+  }
+  return `<div class="" id="property-card">${html}</div>`
+}
+
+function buildModelCardFooter(modelId) {
+  return `
+    <div class="" id="model-card-footer">
+      <div class="float-end">
+        <div class="m-2">
+          <a
+            href="/objects/${modelId}"
+            class="border border-success rounded d-inline-block"
+            role="button"
+          >
+            <i class="mx-2 fs-5 bi bi-eye text-success"></i
+          ></a>
+        </div>
+      </div>
+      <hr
+        style="
+          height: 2px;
+          width: 100%;
+          border-width: 0;
+          color: grey;
+          background-color: grey;
+        "
+      />
+    </div>
+  `
+}
+
+async function fetchModels(page, text, count = 10) {
+  show(loadingIndicator$)
+  const response = await fetch(
+    '/api/v1/objects/',
+    {
+      method: 'POST',
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        page,
+        count,
+        text
+      }),
+    }
+  );
+  const models = await response.json();
+  hide(loadingIndicator$)
+  return models;
+}
+
+function show(element$) {
+  element$.removeClass('d-none')
+}
+
+function hide(element$) {
+  element$.addClass('d-none')
+}
+
+function changeInnerText(element$, value) {
+  element$.html(value)
+}
+</script>

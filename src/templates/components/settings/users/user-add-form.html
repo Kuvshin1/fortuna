@@ -1,0 +1,26 @@
+<form method="post">
+    <div class="mb-3">
+      <label for="inputLogin" class="form-label">Логин</label>
+      <input name="login" class="form-control" id="inputLogin" aria-describedby="emailHelp" required>
+    </div>
+    <div class="mb-3">
+        <label for="roleSelector" class="form-label">Роль</label>
+        <select class="form-select" name="role" id="roleSelector" required>
+          <option selected disabled value="">Выберите роль</option>
+          <!-- TODO: automatic generate -->
+          <option value="USER">Пользователь</option>
+          <option value="MODERATOR">Модератор</option>
+          <option value="ADMIN">Администратор</option>
+        </select>
+    </div>
+    <h5>Настройте список доступа</h5>
+    {% for schema in models_list %}
+      <div class="form-check mb-2">
+        <input class="form-check-input" name="access_model_kinds" type="checkbox" value="{{ schema.name }}" id="{{ loop.index }}">
+        <label class="form-check-label" for="{{ loop.index }}">
+          {{ schema.name }}
+        </label>
+      </div>
+    {% endfor %}
+    <button class="btn btn-primary mt-3" type="submit">Создать</button>
+  </form>

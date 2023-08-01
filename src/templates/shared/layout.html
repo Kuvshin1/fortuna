@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Fortuna</title>
+    <link
+            rel="stylesheet"
+            href="{{ url_for('static', path='/css/common.css') }}"
+    />
+    <link
+            rel="stylesheet"
+            href="{{ url_for('static', path='/css/bootstrap.min.css') }}"
+    />
+    <link
+            rel="stylesheet"
+            href="{{ url_for('static', path='/css/bootstrap-icons.css') }}"
+    />
+    <link
+            rel="stylesheet"
+            href="{{ url_for('static', path='/css/dataTables.bootstrap5.min.css') }}"
+    />
+    <script src="{{ url_for('static', path='/js/jquery-3.6.3.min.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/notify.js') }}"></script>
+</head>
+<body>
+{% set user_role_map = {'ADMIN': 'danger', 'MODERATOR': 'warning', 'USER': 'primary'} %}
+{% block header %} {% endblock header %} {% block body %} {% endblock %}
+
+<div class="container-fluid">
+    <div class="row flex-nowrap">
+        {% block sidebar %} {% endblock %}
+        <div class="col">
+            {% include "/components/global/error-alert.html" %}
+            <div>{% block content %} {% endblock %}</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+.exit-icon {
+    font-size: 1.5rem; 
+    width:32px;
+}
+
+.bg-main {
+    background-color: #3c3e87;
+}
+
+.bg-sidebar {
+    background-color: #E7E3D4;
+}
+
+.bg-content {
+    background-color: #f0f0f0;
+}
+
+.logo-container {
+    display:table-cell;
+    vertical-align:bottom;
+}

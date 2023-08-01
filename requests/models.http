@@ -1,0 +1,9 @@
+POST http://127.0.0.1:8000/api/v1/objects
+content-type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjNjNWM2OGFhNTMyMzRmOTdiYjFmNzUwIiwiZXhwIjoxNjc4ODg2MjA1fQ.DpHBCk8tm7WGiLj-2HLjrfb52DP8YVnONMLob202bcc
+
+{
+    "page": 1,
+    "count": 1,
+    "text": ""
+}

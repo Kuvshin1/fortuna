@@ -1,0 +1,88 @@
+<form method="post" id="modelForm" data-schema_name="{{ models_schema.name }}" class="pb-5">
+    {% for type in types %}
+    <fieldset id="{{ type.name }}">
+        <legend>{{ type.name }}</legend>
+        {% for property in type.properties %}
+            {% if property.primitive_type.value == "STR" %}
+            <div class="mb-3">
+                <span>{{ property.name }}</span>
+                <input name="{{ property.name }}" class="form-control" aria-describedby="emailHelp" required>
+            </div>
+            {% elif property.primitive_type.value == "NUMBER" %}
+            <div class="mb-3">
+                <span>{{ property.name }}</span>
+                <input name="{{ property.name }}" class="form-control" type="number" required>
+            </div>
+            {% elif property.primitive_type.value == "BOOL" %}
+            <div class="mb-3">
+                <span>{{ property.name }}</span>
+                <input name="{{ property.name }}" class="form-check-input ms-2" type="checkbox">
+            </div>
+            {% elif property.primitive_type.value == "DATE" %}
+            <div class="mb-3">
+                <span>{{ property.name }}</span>
+                <input name="{{ property.name }}" class="form-control" type="date" />
+            </div>
+            {% endif %}
+        {% endfor %}
+    </fieldset>
+    {% endfor %}
+    <button class="btn btn-success mt-3 float-end " type="submit">Создать объект</button>
+</form>
+  <script>
+    function serializeForm(formNode) {
+        const fieldsets  = formNode.children
+        const properties = {}
+
+        Array.from(fieldsets).filter((item) => item.tagName != "BUTTON").forEach((fieldset) => {
+            properties[fieldset.id] = []
+            Array.from(fieldset.elements).forEach((input) => {
+                if (["number", "text", "date"].includes(input.type) ) {
+                    properties[fieldset.id].push({'name':input.name, 'value':input.value})
+                }
+                else if (input.type == "checkbox") {
+                    properties[fieldset.id].push({'name':input.name, 'value':input.checked})
+                }
+            })
+        })
+        return properties
+    }
+
+    async function sendData(properties) {
+        $.ajax({
+            url: "{{ add_object_endpoint }}",
+            processData: false,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                model_id: "{{ models_schema.id }}",
+                properties: decode_properties_to_payload(properties)
+            }),
+            beforeSend: function() {
+                $('button').prop("disabled", true)
+            }, 
+            success: function(response){
+                $('#modelForm')[0].reset()
+                $.notify(`Объект модели "{{ models_schema.name }}" создан успешно`,"success")
+            },
+            complete: function() {
+                $('button').prop("disabled", false)
+            }
+        })}
+    
+    function decode_properties_to_payload(property) {
+        return Object.entries(property).map(([key, value], _) => ({
+            property_name: key,
+            data: value
+        }))
+    }
+        
+    async function handleFormSubmit(event) {
+        event.preventDefault()
+        const properties = serializeForm(event.target)
+        const response = await sendData(properties)
+    }
+
+    const applicantForm = document.getElementById('modelForm')
+    applicantForm.addEventListener('submit', handleFormSubmit)
+  </script>

@@ -1,0 +1,60 @@
+<div class="modal fade" id="modal-token-show" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="1" aria-labelledby="ModalToggleLabel">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tokenModalLabel">Новый токен</h5>
+      </div>
+      <div class="modal-body text-break input-group">
+        <input type="text" readonly class="form-control" value="{{ token }}" name="token" aria-describedby="button-addon2" id="tokenValue">
+        <button class="btn btn-outline-secondary" type="button" id="button-addon2" data-bs-toggle="tooltip" onclick="copyToClipboard()"
+                data-bs-placement="top" title="Скопировано" data-bs-trigger="click">
+            <i class="bi bi-files"></i>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <p>Внимание! После закрытия этого окна снова увидеть токен будет невозможно. Настоятельно рекомендуем скопировать его</p>
+        <button class="btn btn-primary" data-bs-target="#modal-confirm" data-bs-toggle="modal" data-bs-dismiss="modal">Закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modal-confirm" aria-hidden="true" aria-labelledby="tokenModalLabel2" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tokenModalLabel2">Внимание!</h5>
+      </div>
+      <div class="modal-body">
+        Вы уверены, что хотите закрыть это окно? Вернуться к просмотру токена будет невозможно
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-bs-target="#modal-token-show" data-bs-toggle="modal" data-bs-dismiss="modal">Вернуться к токену</button>
+        <a class="btn btn-danger" href="{{ url_for('user_list_page') }}" role="button">Закрыть</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+
+  function copyToClipboard() {
+    navigator.clipboard.writeText($("#tokenValue").val())
+    setTimeout(function() {
+      $('[data-bs-toggle="tooltip"]').tooltip('hide');
+    }, 1500);
+  }
+
+  $(document).ready(function() {
+    if ('{{ token }}') {
+      const modalTokenShow = new bootstrap.Modal(document.getElementById('modal-token-show'), {
+        keyboard: false
+      })
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+      })
+
+      modalTokenShow.show()
+    }
+  })
+
+</script>

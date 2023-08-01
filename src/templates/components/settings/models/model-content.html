@@ -1,0 +1,72 @@
+<div class="row col-10">
+    <!-- Блок, который потенциально можно было бы реализовать -->
+    <!-- <div class="p-3 col-5 border rounded overflow-hidden shadow-sm mb-3 ms-2">
+        <h5>Основная Информация</h5>
+        <hr/>
+        <div>
+            <div class="mb-1"><span class="fw-light">Создал: </span><b>16/01/2023, 21:49:43</b></div>
+            <div class="mb-1">
+                <span class="fw-light">Дата создания: </span><b>03/02/2023, 21:49:43</b>
+            </div>
+            <div class="mb-1">
+                <span class="fw-light">Количество изменений: </span><b>5</b>
+            </div>
+            <div class="mb-1">
+                <span class="fw-light">Последнее изменение: </span>
+                {% if last_auth_log %}
+                    <b>03/02/2023, 21:49:43</b>
+                {% else %}
+                    <b>Отсутствует</b>
+                {% endif %}
+            </div>
+        </div>
+    </div> -->
+    <div class="row col-10 p-3 border rounded overflow-hidden shadow-sm ms-2">
+        <div class="d-flex justify-content-between align-items-center pb-1">
+            <div class="mr-auto">
+                <b>Модель</b>
+            </div>
+            <div>
+                <a href="{{ url_for('history_model_modification', id=model.id) }}" class="border border-success rounded d-inline-block" role="button">
+                    <i class="mx-2 fs-5 bi bi-clock-history text-success"></i>
+                </a>
+                <a href="{{ url_for('update_object_page', id=model.id) }}" class="border border-primary rounded d-inline-block" role="button">
+                    <i class="mx-2 fs-5 bi bi-pencil"></i>
+                </a>
+            </div>
+        </div>
+        <hr/>
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+            {% for type in types %}
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="open-{{ type.id }}">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ type.id }}" aria-expanded="true" aria-controls="collapse-{{ type.id }}">
+                    {{ type.name }}
+                </button>
+              </h2>
+              <div id="collapse-{{ type.id }}" class="accordion-collapse collapse show" aria-labelledby="open">
+                <div class="accordion-body">
+                    <ul class="list-group list-group-flush">
+                    {% for property in type.properties %}
+                    <li class="list-group-item list-group-item d-flex">
+                        {% if property.primitive_type.value == "STR" %}  
+                            <i class="fs-5 bi-card-text d-inline-block my-auto me-2"></i> 
+                        {% elif property.primitive_type.value == "NUMBER" %}
+                            <i class="fs-5 bi-123 d-inline-block my-auto me-2"></i> 
+                        {% elif property.primitive_type.value == "DATE" %}
+                            <i class="fs-5 bi-calendar3 d-inline-block my-auto me-2"></i>
+                        {% elif property.primitive_type.value == "BOOL" %}
+                            <i class="fs-5 bi-check-square d-inline-block my-auto me-2"></i>
+                        {% endif %}
+                            <p class="my-auto">{{ property.name }}</p>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+</div>

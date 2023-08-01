@@ -1,0 +1,260 @@
+<div class="col-12">
+    <div class="row">
+        <div class="col-2 mb-3">
+            <div>
+                <label for="selectModelStatus" class="col-sm-2 col-form-label">Статус:</label>
+                <select id="selectModelStatus" class="form-select form-select-sm">
+                    <option value="None" {% if not status %} selected {% endif %}>Все</option>
+                    <option value="waiting" {% if status == "waiting" %} selected {% endif %}>Ожидает подтверждения</option>
+                    <option value="approved" {% if status == "approved" %}selected{% endif %}>Подтверждено</option>
+                    <option value="declined" {% if status == "declined" %}selected{% endif %}>Отклонено</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-2 mb-3">
+            <div>
+                <label for="selectModelSchema" class="col-sm-2 col-form-label">Модель:</label>
+                <select id="selectModelSchema" class="form-select form-select-sm">
+                    <option value="None" selected>Все</option>
+                    {% for schema in models %}
+                    <option value="{{ schema.id }}" {% if schema.id|string == model_id %}selected{% endif %}>{{ schema.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="col-2 mb-3">
+            <div>
+                <label for="selectUser" class="col-sm-2 col-form-label">Владелец:</label>
+                <select id="selectUser" class="form-select form-select-sm">
+                    <option value="None" selected>Все</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}" {% if user.id|string == owner_id %}selected{% endif %}>{{ user.login }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="col-3 mb-3">
+            <div>
+                <label for="selectDateBefore" class=" col-form-label">Дата создания с:</label>
+                <input id="selectDateBefore" class="form-control" type="datetime-local" value="{{ date_before }}"/>
+            </div>
+        </div>
+        <div class="col-3 mb-3">
+            <div>
+                <label for="selectDateAfter" class=" col-form-label">Дата создания по:</label>
+                <input id="selectDateAfter" class="form-control" type="datetime-local" value="{{ date_after }}"/>
+            </div>
+        </div>
+    </div>
+    <table id="datatables-models" class="table table-striped display" style="width:100%">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Дата создания</th>
+            <th>Статус</th>
+            <th>Владелец</th>
+            <th>Модель</th>
+            <th></th>
+        </tr>
+        </thead>
+    </table>
+    {% if model_id != None or owner_id != None or date_before != None or date_after != None %}
+    <button class="btn btn-success mt-3 me-2" id="approveMany" type="button" onclick="showModal('принять', 'approveAll()')">Принять все</button>
+    <button class="btn btn-danger mt-3 me-3" id="declineMany" type="button" onclick="showModal('отклонить', 'declineAll()')">Отклонить все</button>
+    <p class="d-none" id="notDisabledFlag"></p>
+    {% else %}
+    <button class="btn btn-success mt-3 me-2" id="approveMany" type="button" disabled>Принять все</button>
+    <button class="btn btn-danger mt-3 me-2" id="declineMany" type="button" disabled>Отклонить все</button>
+    <button type="button" class="btn mt-3 p-0 btn-outline-primary px-2" id="hint" data-bs-toggle="popover" data-bs-content="Для того, чтобы кнопки стали активными выберите хотя бы 1 модель или примените хотя бы 1 фильтр"><p class="fs-4 m-0 px-1">?</p></button> 
+    {% endif %}
+</div>
+<script>
+    function checkboxChangeListener() {
+        if ($('input[type="checkbox"]:checked').length) {
+            $('#approveMany').html('Принять выбранные')
+            $('#approveMany').prop('disabled', false)
+            $("#approveMany").attr("onclick","showModal('принять', 'approveSelected()')");
+            $('#hint').hide()
+
+            $('#declineMany').html('Отклонить выбранные')
+            $('#declineMany').prop('disabled', false)
+            $("#declineMany").attr("onclick","showModal('отклонить', 'declineSelected()')");
+        }
+        else {
+            $('#approveMany').html('Принять все')
+            $('#declineMany').html('Отклонить все')
+            $('#hint').show()
+            
+            if (!$('#notDisabledFlag').length) {
+                $('#declineMany').prop('disabled', true)
+                $('#approveMany').prop('disabled', true)
+            }
+        }
+    }
+    function getFiltersValue() {
+        const model_id = $('#selectModelSchema').val() == 'None' ? undefined : $('#selectModelSchema').val()
+        const owner_id = $('#selectUser').val() == 'None' ? undefined : $('#selectUser').val()
+        const date_before = $('#selectDateBefore').val() == "" ? undefined : $('#selectDateBefore').val()
+        const date_after = $('#selectDateAfter').val() == "" ? undefined : $('#selectDateAfter').val()
+        const status = $('#selectModelStatus').val() == 'None' ? undefined : $('#selectModelStatus').val()
+        return {
+            model_id, 
+            owner_id, 
+            date_before, 
+            date_after, 
+            status}
+    }
+
+    function changeModelsStatusRequest(action, data) {
+        $.ajax({
+            url: `/api/v1/objects/${action}`,
+            method: 'POST',
+            contentType:'application/json',
+            data: JSON.stringify(data),
+            success: function(response){
+                location.reload()
+            }
+        })
+    }
+    
+    function approveAll() {
+        changeModelsStatusRequest('all/approve', getFiltersValue())
+    }
+    
+    function declineAll() {
+        changeModelsStatusRequest('all/decline', getFiltersValue())
+    }
+
+    function approveSelected() {
+        var modelsId = []
+        $('input[type="checkbox"]:checked').each(function(){ modelsId.push(this.id)})
+        changeModelsStatusRequest('several/approve', modelsId)
+    }
+    
+    function declineSelected() {
+        var modelsId = []
+        $('input[type="checkbox"]:checked').each(function(){ modelsId.push(this.id)})
+        changeModelsStatusRequest('several/decline', modelsId)
+    }
+
+    function createPopover(status, moderator_id=null, date=null, reason=null) {
+        let buttonColor = status == 'Отклонено' ? 'danger' : status == 'Ожидает подтверждения' ? 'warning' : 'success'       
+        let action = status == 'Отклонено' ? 'отклонён' : status == 'Ожидает подтверждения' ? 'ожидает подтверждения' : 'подтверждён'      
+        let moderator = moderator_id != null ? `модератором <b>${moderator_id}</b>` : ''   
+        reason = reason != null ? `по причине: <b>${reason}</b>` : ''    
+        date = date != null ? `в <b>${new Date(date).toLocaleString('ru-RU')}</b>` : ''
+
+        return `<button type="button" class="btn btn-sm btn-${buttonColor}" data-bs-toggle="popover"\
+                data-bs-html="true" data-bs-content="Объект ${action} ${moderator} ${reason} ${date}">${status}</button>`
+    }
+
+    function render_dt() {
+        $('#datatables-models').DataTable({
+            processing: true,
+            serverSide: true,
+            ordering: false,
+            searching: false,
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.1/i18n/ru.json'
+            },
+            ajax: {
+                url: '/api/v1/objects/list/dt',
+                type: 'POST',
+                data: function (data) {
+                    return JSON.stringify({
+                        ...data,
+                        filters: getFiltersValue()
+                    })
+                },
+                contentType: 'application/json',
+            },
+            aoColumns: [
+                { "mData": "id" },
+                { "mData": "created_at" },
+                { "mData": "status" },
+                { "mData": "owner_id" },
+                { "mData": "model_name"},
+                { "mData": "id" }
+            ],
+            columnDefs: [
+                {
+                    "target": 0,
+                    "render": function(value, type, row, meta) {
+                        return `<input onchange="checkboxChangeListener()" class="form-check-input" type="checkbox" id="${value}" value="${value}" aria-label="...">`
+                    }
+                },
+                {
+                    "target": 1,
+                    "render": function(value, type, row, meta) {
+                        const result = new Date(value)
+                        return result.toLocaleString('ru-RU')
+                    }
+                },
+                {
+                    "target": 2,
+                    "render": function(value, type, row, meta) {
+                        let result = ''
+                        if (value.approve_at==null && value.decline_at==null) {
+                            result = createPopover('Ожидает подтверждения')
+                        }
+                        else if (value.approve_at!=null && value.decline_at==null) {
+                            result = createPopover('Подтверждено', value.moderator_id, value.approve_at, value.reason)
+                        }
+                        else if (value.approve_at==null && value.decline_at!=null) {
+                            result = createPopover('Отклонено', value.moderator_id, value.decline_at, value.reason)
+                        }
+                        return result
+                    }
+                },
+                {
+                    "target": 5,
+                    "render": function(value, type, row, meta) {
+                        return `<a href="/objects/${value}" class="border border-success rounded d-inline-block" role="button">\
+                            <i class="mx-2 fs-5 bi bi-eye text-success"></i></a>`
+                    }
+                },
+
+            ],
+            "initComplete":function(settings, json) {
+                var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+                var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                    return new bootstrap.Popover(popoverTriggerEl)
+                })
+                $('[data-bs-toggle="popover"]').on('shown.bs.popover', function() {
+                    setTimeout(function(current_popover) {
+                        console.log(current_popover)
+                        $(current_popover).popover('hide');
+                    }, 2000, this);
+                });
+            }
+        })
+    }
+
+    $(document).ready(function () {
+        render_dt()
+    })
+
+    function reloadPage() {
+        const filters = getFiltersValue()
+
+        let url = window.location.href
+        if (url.indexOf('?') != -1) {
+           url = url.slice(0, url.indexOf('?'))
+        }
+
+        const params = Object.fromEntries(
+            Object.entries(filters).filter(([_, value]) => value != null)
+        )
+
+        recursiveEncoded = $.param(params);
+        url = `${url}?${recursiveEncoded}`
+        window.location.href = url;
+    }
+
+    ['#selectModelSchema', '#selectUser', '#selectDateBefore', '#selectDateAfter', '#selectModelStatus'].forEach(element => {
+        $(element).change(function(value) {
+            reloadPage()
+        })
+    });
+
+</script>

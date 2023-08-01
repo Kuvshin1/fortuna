@@ -1,0 +1,26 @@
+{% extends "/shared/layout.html" %}
+{% block header %}
+    {% include "/components/global/header.html" %}
+{% endblock %}
+{% block sidebar %}
+    {% include "/components/global/sidebar.html" %}
+{% endblock %}
+{% block content %}
+<div class="py-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">Рукводство пользователя</li>
+        </ol>
+    </nav>
+    <h4 class="ms-2">Руководство пользователя</h4>
+    <div class="m-2 p-3 mt-3 shadow col-10">
+        {% include "/components/user_guide/user-section.html" %}
+        {% if request.user.role.value in ['MODERATOR', 'ADMIN'] %}
+            {% include "/components/user_guide/moderator-section.html" %}
+        {% endif %}
+        {% if request.user.role.value == 'ADMIN' %}
+            {% include "/components/user_guide/admin-section.html" %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

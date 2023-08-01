@@ -1,0 +1,40 @@
+<div class="modal fade" id="modal-decline-show" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="1" aria-labelledby="ModalToggleLabel">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body input-group">
+            <div>
+                <p>Опишите причину отклонения объекта<i> (необязательно)</i></p>
+            </div>
+            <div class="col-12">
+                <input type="text" class="form-control" id="reason">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a class="btn btn-primary" href="{{ url_for('object_page', id=object.id) }}" role="button">Отмена</a>
+            <button class="btn btn-danger" onclick="decline_object()">Отклонить</a>
+        </div>
+      </div>
+    </div>
+</div>
+<script>
+    var modalDeclineShow = new bootstrap.Modal(document.getElementById('modal-decline-show'))
+    function showModalDecline(action) {
+        $("#action").text(action)
+        modalDeclineShow.show()
+    }
+    function decline_object() {
+        let data = {}
+        data['id'] = "{{ object.id }}"
+        data['reason'] = $('#reason').val() != '' ? $('#reason').val() : undefined
+        $.ajax({
+        url: "/api/v1/objects/{{ object.id }}/decline",
+        method: 'POST',
+        contentType:'application/json',
+        data: JSON.stringify(data),
+        success: function(response){
+            modalDeclineShow.hide()
+            showModal('отклонена')
+        }
+    })
+    }
+</script>

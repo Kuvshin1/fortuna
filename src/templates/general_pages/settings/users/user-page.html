@@ -1,0 +1,21 @@
+{% extends "/shared/layout.html" %}
+{% block header %}
+    {% include "/components/global/header.html" %}
+{% endblock %}
+{% block sidebar %}
+    {% include "/components/global/sidebar.html" %}
+{% endblock %}
+{% block content %}
+<div class="py-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ url_for('user_list_page') }}">Список пользователей</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Просмотр пользователя</li>
+        </ol>
+    </nav>
+    <h4 class="ms-2">Информация о пользователе</h4>
+    <div class="m-2 p-3 mt-3">
+        {% include "/components/settings/users/user-content.html" %}
+    </div>
+</div>
+{% endblock %}

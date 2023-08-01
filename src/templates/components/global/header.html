@@ -1,0 +1,26 @@
+<header class="p-2 bg-main shadow-sm">
+    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <div class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+            <h4>
+                <a href="/" class="text-decoration-none text-white">
+                    <img src="/static/icons/android-chrome-192x192.png" height="30"/>
+                    <span class="d-sm-inline text-white align-bottom">Фортуна</span>
+                </a>
+            </h4>
+        </div>
+        <div class="text-end">
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <li>                
+                    <span class="px-2 mt-2 d-block text-white">
+                        {{ request.user.login }}
+                    </span>
+                </li>
+                <li>
+                    <a href="/auth/logout" class="px-2 pt-1 d-block text-decoration-none text-white">
+                        <i class="bi bi-box-arrow-right exit-icon"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>

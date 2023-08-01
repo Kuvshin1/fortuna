@@ -1,0 +1,18 @@
+{% extends "/shared/layout.html" %}
+{% block header %}
+    {% include "/components/global/header.html" %}
+{% endblock %}
+{% block sidebar %}
+    {% include "/components/global/sidebar.html" %}
+{% endblock %}
+{% block content %}
+<div class="py-3">
+    <div class="d-flex justify-content-between align-items-center col-8">
+        <div class="mr-auto"><h4 class="ms-2">Пользовательские типы данных</h4></div>
+        <div><a class="btn btn-success" href="{{ url_for('add_property_page') }}" role="button">Добавить</a></div>
+    </div>
+    <div class="m-2 p-3 mt-3 shadow-sm">
+        {% include "/components/settings/properties/properties-list.html" %}
+    </div>
+</div>
+{% endblock %}

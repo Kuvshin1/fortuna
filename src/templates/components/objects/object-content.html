@@ -1,0 +1,46 @@
+<div class="pb-5">
+    <div class="d-flex flex-wrap">
+    {% for property in object.payload %}
+    <div id="{{ property.property_name }}" class="col-5 mb-3">
+        <legend class="fs-5 bold "><b>{{ property.property_name }}</b></legend>
+        {% set outher_index = loop %}
+        {% for field in property.data %}
+            {% if properties[outher_index.index0].properties[loop.index0].primitive_type.value in ["STR", "NUMBER", "DATE"] %}
+            <div class="mb-1">
+                <p class="mb-0"><b>{{ field.name }}: </b>{{ field.value }}</p>
+            </div>
+            {% elif properties[outher_index.index0].properties[loop.index0].primitive_type.value == "BOOL" %}
+            <div class="mb-1">
+                <b>{{ field.name }}: </b>
+                <input name="{{ field.name }}" disabled class="form-check-input ms-2" type="checkbox" 
+                {% if field.value == "True" %}
+                checked
+                {% endif %}>
+            </div>
+            {% endif %}          
+        {% endfor %}
+    </div>
+    {% endfor %}
+    </div>
+    {% if request.user.role.value != 'USER' %}
+        {% if object.status.approve_at == None %}
+        <button class="btn btn-success mt-3 float-end me-2" onclick="approve_object()" type="button">Принять</button>
+        {% endif %}
+        {% if object.status.decline_at == None %}
+        <button class="btn btn-danger mt-3 float-end me-3" onclick="showModalDecline()" type="submit">Отклонить</button>
+        {% endif %}
+    {% endif %}
+</div>
+  <script>
+    function approve_object() {
+        $.ajax({
+        url: "/api/v1/objects/{{ object.id }}/approve",
+        method: 'POST',
+        contentType:'application/json',
+        data: JSON.stringify({id:"{{ object.id }}"}),
+        success: function(response){
+            location.reload()
+        }
+    })
+    }
+  </script>
